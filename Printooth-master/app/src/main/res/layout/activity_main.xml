@@ -3,32 +3,104 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:background="#F1F1F1"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnBpjs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="BPJS"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.266"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.512" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnUmum"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="44dp"
-        android:text="UMUM"
+    <androidx.cardview.widget.CardView
+        android:id="@+id/queueUmum"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="56dp"
+        android:layout_marginEnd="40dp"
+        app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.714"
-        app:layout_constraintStart_toEndOf="@+id/btnBpjs"
-        app:layout_constraintTop_toTopOf="@+id/btnBpjs" />
+        app:layout_constraintTop_toBottomOf="@+id/cardView">
+
+        <TextView
+            android:id="@+id/textUmum"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="B 2"
+            android:textSize="60sp"
+            android:textStyle="bold" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/queueBpjs"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="56dp"
+        app:cardElevation="4dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cardView">
+
+        <TextView
+            android:id="@+id/textBpjs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="A 1"
+            android:textSize="60sp"
+            android:textStyle="bold" />
+    </androidx.cardview.widget.CardView>
+
+    <ImageView
+        android:id="@+id/cardView"
+        android:layout_width="190dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="56dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo_rspjember" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardBpjs"
+        android:layout_width="140dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="64dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/queueUmum">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnBpjs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#8BC34A"
+            android:text="BPJS"
+            android:textStyle="bold"
+            android:textColor="#fff"
+            android:textSize="34sp"
+            android:visibility="visible" />
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardUmum"
+        android:layout_width="140dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="64dp"
+        android:layout_marginEnd="32dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/queueBpjs">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnUmum"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#FF9800"
+            android:text="UMUM"
+            android:textStyle="bold"
+            android:textColor="#fff"
+            android:textSize="34sp"
+            android:visibility="visible" />
+    </androidx.cardview.widget.CardView>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnPrintImages"
@@ -42,13 +114,17 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnPiarUnpair"
-        android:layout_width="wrap_content"
+        android:layout_width="260dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:background="#345DF4"
+        android:layout_marginTop="32dp"
+        android:textStyle="bold"
+        android:textColor="#ffff"
+        android:drawableStart="@drawable/ic_baseline_bluetooth_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnBpjs" />
+        app:layout_constraintTop_toBottomOf="@+id/cardBpjs" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnCustomPrinter"
@@ -62,5 +138,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/btnPiarUnpair"
         app:layout_constraintVertical_bias="0.932" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

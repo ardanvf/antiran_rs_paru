@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
                     ScanningActivity::class.java),
                     ScanningActivity.SCANNING_FOR_PRINTER)
             else {
-                val jenis = "BPJS"
+                jenis("BPJS")
                 printSomePrintable()
             }
         }
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                 ScanningActivity::class.java),
                 ScanningActivity.SCANNING_FOR_PRINTER)
             else {
-                val jenis = "Umum"
+                jenis("UMUM")
                 printSomePrintable()
             }
         }
@@ -87,15 +87,15 @@ class MainActivity : AppCompatActivity() {
 
         printing?.printingCallback = object : PrintingCallback {
             override fun connectingWithPrinter() {
-                Toast.makeText(this@MainActivity, "Connecting with printer", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Tunggu Sebentar..", Toast.LENGTH_SHORT).show()
             }
-
+            // Berhasil mengirim data ke thermal printer
             override fun printingOrderSentSuccessfully() {
-                Toast.makeText(this@MainActivity, "Order sent to printer", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Silahkan Kertas Antrian Anda", Toast.LENGTH_SHORT).show()
             }
-
+            // Gagal menyambungkan ke bluetooth
             override fun connectionFailed(error: String) {
-                Toast.makeText(this@MainActivity, "Failed to connect printer", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Gagal Mencetak Kertas Antrian", Toast.LENGTH_SHORT).show()
             }
 
             override fun onError(error: String) {
@@ -103,14 +103,18 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onMessage(message: String) {
-                Toast.makeText(this@MainActivity, "Message: $message", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Pesan Error: $message", Toast.LENGTH_SHORT).show()
             }
-
+            //Memutuskan Koneksi Bluetooth
             override fun disconnected() {
-                Toast.makeText(this@MainActivity, "Disconnected Printer", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, "Memutuskan Bluetooth", Toast.LENGTH_SHORT).show()
             }
 
         }
+    }
+
+    private fun jenis(teks: String): String{
+        return teks
     }
 
     private fun printSomePrintable() {
@@ -146,7 +150,7 @@ class MainActivity : AppCompatActivity() {
             .build())
 
         add(TextPrintable.Builder()
-            .setText("BPJS\n")
+            .setText("\n")
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD)
             .setCharacterCode(DefaultPrinter.LINE_SPACING_60)
