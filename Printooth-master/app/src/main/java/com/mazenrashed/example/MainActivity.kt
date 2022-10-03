@@ -2,11 +2,18 @@ package com.mazenrashed.example
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.BitmapFactory
+import android.media.tv.TvContract.Programs.Genres.decode
+import android.net.Uri.decode
 import android.os.Bundle
+import android.util.Base64.decode
 import android.util.Log
 import android.view.View
+import android.webkit.URLUtil.decode
 import android.widget.TextView
 import android.widget.Toast
+import android.util.Base64
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.mazenrashed.example.Model.TicketRequest
 import com.mazenrashed.example.Model.TicketResponse
@@ -27,6 +34,11 @@ import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Byte.decode
+import java.lang.Integer.decode
+import java.lang.Long.decode
+import java.lang.Short.decode
+import java.net.URLDecoder.decode
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -38,6 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var txtBpjs: TextView
     lateinit var txtUmum: TextView
+    lateinit var imgView: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 
         txtBpjs = findViewById(R.id.textBpjs)
         txtUmum = findViewById(R.id.textUmum)
+        imgView = findViewById(R.id.cardView)
 
 
         if (Printooth.hasPairedPrinter())
@@ -87,10 +101,11 @@ class MainActivity : AppCompatActivity() {
                 response: Response<TicketResponse>
             ) {
                 if (jenis.equals("A")) {
-                    var cetakTiket = "A " + response.body()?.no_antrian.toString()
+                    val cetakTiket = "A ${response.body()?.no_antrian.toString()}"
                     print(cetakTiket)
+
                 } else if(jenis.equals("B")){
-                    var cetakTiket = "B " + response.body()?.no_antrian.toString()
+                    val cetakTiket = "B ${response.body()?.no_antrian.toString()}"
                     print(cetakTiket)
                 }
             }
@@ -129,7 +144,7 @@ class MainActivity : AppCompatActivity() {
                 ScanningActivity::class.java),
                 ScanningActivity.SCANNING_FOR_PRINTER)
             else {
-                printSomePrintable()
+                printSomePrintableUmum()
             }
         }
 
@@ -180,8 +195,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun printSomePrintable() {
-        val printables = getSomePrintables()
-        printing?.print(printables)
+        Toast.makeText(this,"Tunggu Sebentar..", Toast.LENGTH_SHORT).show()
+        Log.e("Pesan Button", PostTicketQueue("A").toString())
+//        printing?.print(printables)
+    }
+
+    private fun printSomePrintableUmum() {
+        Toast.makeText(this,"Tunggu Sebentar..", Toast.LENGTH_SHORT).show()
+        val printables = getSomePrintables("UMUM", "GG")
+        Log.e("Pesan Button", printables.toString())
+//        printing?.print(printables)
     }
 
     private fun printSomeImages() {
@@ -197,7 +220,7 @@ class MainActivity : AppCompatActivity() {
     var month_date = SimpleDateFormat("EEEE, dd MMMM yyyy, HH:mm")
     var waktu = month_date.format(cal.time)
 
-    private fun getSomePrintables(jenis: String, nomer: Int) = ArrayList<Printable>().apply {
+    private fun getSomePrintables(jenis: String, nomer: String) = ArrayList<Printable>().apply {
 
         add(RawPrintable.Builder(byteArrayOf(27, 100, 4)).build()) // feed lines example in raw mode
         add(ImagePrintable.Builder(R.drawable.logo, resources)
@@ -205,14 +228,15 @@ class MainActivity : AppCompatActivity() {
             .build()
         )
         add(TextPrintable.Builder()
-            .setText("RS Paru Jember\n")
+            .setText("\nRS Paru Jember\n")
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_NORMAL)
             .setNewLinesAfter(1)
             .build())
 
         add(TextPrintable.Builder()
-            .setText( jenis + "\n")
+            .setText("${jenis}\n")
+            .setFontSize(DefaultPrinter.FONT_SIZE_LARGE)
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD)
             .setCharacterCode(DefaultPrinter.LINE_SPACING_60)
@@ -226,7 +250,7 @@ class MainActivity : AppCompatActivity() {
             .build())
 
         add(TextPrintable.Builder()
-            .setText("$nomer + \n")
+            .setText("$nomer \n\n")
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setFontSize(DefaultPrinter.FONT_SIZE_LARGE)
             .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD)
