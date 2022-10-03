@@ -1,6 +1,6 @@
 package com.mazenrashed.example.Rest_Api
 
-data class noAntrianResponse(
+data class CreatePostResponse (
     val kode_antrian: String?,
-    val no_antrian: String
+    val no_antrian: Int?
 )

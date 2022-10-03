@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="#F1F1F1"
+    android:background="@drawable/bg"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
@@ -11,7 +11,7 @@
         android:id="@+id/queueUmum"
         android:layout_width="120dp"
         android:layout_height="120dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="64dp"
         android:layout_marginEnd="40dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="B 2"
+            android:text="-"
             android:textSize="60sp"
             android:textStyle="bold" />
     </androidx.cardview.widget.CardView>
@@ -32,41 +32,42 @@
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="56dp"
+        android:layout_marginTop="64dp"
         app:cardElevation="4dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView">
-
         <TextView
             android:id="@+id/textBpjs"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:text="A 1"
+            android:text="-"
             android:textSize="60sp"
             android:textStyle="bold" />
     </androidx.cardview.widget.CardView>
 
-    <ImageView
-        android:id="@+id/cardView"
-        android:layout_width="190dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="56dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/logo_rspjember" />
+        <ImageView
+            android:id="@+id/cardView"
+            android:layout_width="237dp"
+            android:layout_height="158dp"
+            android:layout_marginTop="56dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/logo_rspjember" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardBpjs"
         android:layout_width="140dp"
         android:layout_height="60dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="24dp"
+        android:elevation="4dp"
         app:cardCornerRadius="8dp"
+        app:cardUseCompatPadding="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/queueUmum">
+        app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnBpjs"
@@ -74,9 +75,9 @@
             android:layout_height="match_parent"
             android:background="#8BC34A"
             android:text="BPJS"
-            android:textStyle="bold"
             android:textColor="#fff"
             android:textSize="34sp"
+            android:textStyle="bold"
             android:visibility="visible" />
     </androidx.cardview.widget.CardView>
 
@@ -84,11 +85,12 @@
         android:id="@+id/cardUmum"
         android:layout_width="140dp"
         android:layout_height="60dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="24dp"
         android:layout_marginEnd="32dp"
         app:cardCornerRadius="8dp"
+        app:cardUseCompatPadding="true"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/queueBpjs">
+        app:layout_constraintTop_toBottomOf="@+id/textView">
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnUmum"
@@ -96,9 +98,9 @@
             android:layout_height="match_parent"
             android:background="#FF9800"
             android:text="UMUM"
-            android:textStyle="bold"
             android:textColor="#fff"
             android:textSize="34sp"
+            android:textStyle="bold"
             android:visibility="visible" />
     </androidx.cardview.widget.CardView>
 
@@ -139,6 +141,17 @@
         app:layout_constraintTop_toBottomOf="@id/btnPiarUnpair"
         app:layout_constraintVertical_bias="0.932" />
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:text="Pilih Jenis Antrian Anda :"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/queueBpjs" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
