@@ -3,13 +3,17 @@ package com.mazenrashed.example
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.mazenrashed.example.Rest_Api.CreatePostResponse
-import com.mazenrashed.example.Rest_Api.RetrofitClient
-import com.mazenrashed.example.Rest_Api.noAntrianResponse
+import com.mazenrashed.example.Model.TicketRequest
+import com.mazenrashed.example.Model.TicketResponse
+import com.mazenrashed.example.Model.UserRequest
+import com.mazenrashed.example.Model.UserResponse
+import com.mazenrashed.example.Rest_Api.Api
+import com.mazenrashed.example.Rest_Api.Retro
 import com.mazenrashed.printooth.Printooth
 import com.mazenrashed.printooth.data.printable.ImagePrintable
 import com.mazenrashed.printooth.data.printable.Printable
@@ -20,12 +24,11 @@ import com.mazenrashed.printooth.ui.ScanningActivity
 import com.mazenrashed.printooth.utilities.Printing
 import com.mazenrashed.printooth.utilities.PrintingCallback
 import kotlinx.android.synthetic.main.activity_main.*
-import org.w3c.dom.Text
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.security.auth.callback.Callback
 import kotlin.collections.ArrayList
 
 
@@ -35,8 +38,6 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var txtBpjs: TextView
     lateinit var txtUmum: TextView
-    var antrianBpjs = "A 1"
-    var antrianUmum = "B 1"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,61 +51,56 @@ class MainActivity : AppCompatActivity() {
             printing = Printooth.printer()
         initViews()
         initListeners()
-        getNoAntrian()
+        postNoAntrian("A")
+        postNoAntrian("B")
     }
 
-
-    private fun postNoAntrian(){
-        RetrofitClient.instance.createPost().enqueue(object : retrofit2.Callback<ArrayList<>>)
-
-    }
-
-    private fun getNoAntrian(){
-        RetrofitClient.instance.getAntrian().enqueue(object: retrofit2.Callback<ArrayList<noAntrianResponse>>{
-            override fun onResponse(
-                call: Call<ArrayList<noAntrianResponse>>,
-                response: Response<ArrayList<noAntrianResponse>>
-            ) {
-                if (response.body()?.isEmpty()?:false){
-                    txtBpjs.text = "A 1"
-                    txtUmum.text = "B 2"
-                } else{
-                    for (antrian in response.body()!!){
-                        if (antrian.kode_antrian.equals("A")){
-                            txtBpjs.text = "A ${(antrian.no_antrian).toInt()+1}"
-                        } else if (antrian.kode_antrian.equals("B")){
-                            txtUmum.text = "B ${(antrian.no_antrian).toInt()+1}"
-                        }
-                    }
+    private fun postNoAntrian(jenis: String){
+        var getQueue = UserRequest()
+        getQueue.kode = jenis
+        val retro = Retro().getRetroClientInstance("https://bdf7-182-253-186-203.ngrok.io/antrian_rsparu/api/").create(Api::class.java)
+        retro.getNumberQueue(getQueue).enqueue(object : Callback<UserResponse>{
+            override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
+                Log.e("Berhasil", response.code().toString())
+                if (jenis.equals("A")) {
+                    var cetakTiket = "A " + response.body()?.antrian.toString()
+                    txtBpjs.text = cetakTiket
+                } else if(jenis.equals("B")){
+                    var cetakTiket = "B " + response.body()?.antrian.toString()
+                    txtUmum.text = cetakTiket
                 }
             }
 
-            override fun onFailure(call: Call<ArrayList<noAntrianResponse>>, t: Throwable) {
-                TODO("Not yet implemented")
+            override fun onFailure(call: Call<UserResponse>, t: Throwable) {
             }
 
         })
     }
 
-    private fun createPost(kode: String) {
-        RetrofitClient.instance.createPost(
-            kode
-        ).enqueue(object: retrofit2.Callback<CreatePostResponse>{
+    private fun PostTicketQueue(jenis: String){
+        var ticketQueue = TicketRequest()
+        ticketQueue.kode = jenis
+        var retro = Retro().getRetroClientInstance("https://bdf7-182-253-186-203.ngrok.io/antrian_rsparu/api/").create(Api::class.java)
+        retro.getTicketQueue(ticketQueue).enqueue(object : Callback<TicketResponse> {
             override fun onResponse(
-                call: Call<CreatePostResponse>,
-                response: Response<CreatePostResponse>
+                call: Call<TicketResponse>,
+                response: Response<TicketResponse>
             ) {
-                if(kode.equals("A")){
-                    antrianBpjs = "A ${(response.body()?.no_antrian?:0)+1}"
-//                    txtBpjs.text = antrianBpjs
-                } else {
-                    antrianUmum = "A ${(response.body()?.no_antrian?:0)+1}"
-//                    txtUmum.text = antrianUmum
+                if (jenis.equals("A")) {
+                    var cetakTiket = "A " + response.body()?.no_antrian.toString()
+                    print(cetakTiket)
+                } else if(jenis.equals("B")){
+                    var cetakTiket = "B " + response.body()?.no_antrian.toString()
+                    print(cetakTiket)
                 }
             }
-            override fun onFailure(call: Call<CreatePostResponse>, t: Throwable) {
+
+            override fun onFailure(call: Call<TicketResponse>, t: Throwable) {
+                TODO("Not yet implemented")
             }
-        } )
+
+        })
+
     }
 
     private fun initViews() {
@@ -113,7 +109,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             btnPiarUnpair.text = "Sambungkan Bluetooth"
         }
-
         //btnPiarUnpair.text = if (Printooth.hasPairedPrinter()) "Un-pair ${Printooth.getPairedPrinter()?.name}" else "Pair with printer"
     }
 
@@ -124,8 +119,7 @@ class MainActivity : AppCompatActivity() {
                     ScanningActivity::class.java),
                     ScanningActivity.SCANNING_FOR_PRINTER)
             else {
-                createPost("A")
-//                printSomePrintable()
+                printSomePrintable()
             }
         }
 
@@ -135,8 +129,7 @@ class MainActivity : AppCompatActivity() {
                 ScanningActivity::class.java),
                 ScanningActivity.SCANNING_FOR_PRINTER)
             else {
-                createPost("B")
-//                printSomePrintableBPJS()
+                printSomePrintable()
             }
         }
 
@@ -191,11 +184,6 @@ class MainActivity : AppCompatActivity() {
         printing?.print(printables)
     }
 
-//    private fun printSomePrintableBPJS() {
-//        val printables = getSomePrintablesUmum()
-//        printing?.print(printables)
-//    }
-
     private fun printSomeImages() {
         val printables = arrayListOf<Printable>(
             ImagePrintable.Builder(R.drawable.logo, resources)
@@ -209,7 +197,7 @@ class MainActivity : AppCompatActivity() {
     var month_date = SimpleDateFormat("EEEE, dd MMMM yyyy, HH:mm")
     var waktu = month_date.format(cal.time)
 
-    private fun getSomePrintables() = ArrayList<Printable>().apply {
+    private fun getSomePrintables(jenis: String, nomer: Int) = ArrayList<Printable>().apply {
 
         add(RawPrintable.Builder(byteArrayOf(27, 100, 4)).build()) // feed lines example in raw mode
         add(ImagePrintable.Builder(R.drawable.logo, resources)
@@ -224,7 +212,7 @@ class MainActivity : AppCompatActivity() {
             .build())
 
         add(TextPrintable.Builder()
-            .setText("UMUM \n")
+            .setText( jenis + "\n")
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD)
             .setCharacterCode(DefaultPrinter.LINE_SPACING_60)
@@ -238,7 +226,7 @@ class MainActivity : AppCompatActivity() {
             .build())
 
         add(TextPrintable.Builder()
-            .setText("\n")
+            .setText("$nomer + \n")
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setFontSize(DefaultPrinter.FONT_SIZE_LARGE)
             .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD)
@@ -252,50 +240,6 @@ class MainActivity : AppCompatActivity() {
             .setNewLinesAfter(1)
             .build())
     }
-
-//    private fun getSomePrintablesUmum() = ArrayList<Printable>().apply {
-//
-//        add(RawPrintable.Builder(byteArrayOf(27, 100, 4)).build()) // feed lines example in raw mode
-//        add(ImagePrintable.Builder(R.drawable.logo, resources)
-//            .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
-//            .build()
-//        )
-//        add(TextPrintable.Builder()
-//            .setText("RS Paru Jember\n")
-//            .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
-//            .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_NORMAL)
-//            .setNewLinesAfter(1)
-//            .build())
-//
-//        add(TextPrintable.Builder()
-//            .setText("\n")
-//            .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
-//            .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD)
-//            .setCharacterCode(DefaultPrinter.LINE_SPACING_60)
-//            .setNewLinesAfter(1)
-//            .build())
-//
-//        add(TextPrintable.Builder()
-//            .setText("Antrian Nomer :")
-//            .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
-//            .setNewLinesAfter(1)
-//            .build())
-//
-//        add(TextPrintable.Builder()
-//            .setText("B 1\n")
-//            .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
-//            .setFontSize(DefaultPrinter.FONT_SIZE_LARGE)
-//            .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD)
-//            .setUnderlined(DefaultPrinter.UNDERLINED_MODE_ON)
-//            .setNewLinesAfter(1)
-//            .build())
-//
-//        add(TextPrintable.Builder()
-//            .setText(waktu + "\n\n\n\n")
-//            .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
-//            .setNewLinesAfter(1)
-//            .build())
-//    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
