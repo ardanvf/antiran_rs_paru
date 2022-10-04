@@ -52,6 +52,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var txtUmum: TextView
     lateinit var imgView: ImageView
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -68,11 +70,11 @@ class MainActivity : AppCompatActivity() {
         postNoAntrian("A")
         postNoAntrian("B")
     }
-
+    
     private fun postNoAntrian(jenis: String){
         var getQueue = UserRequest()
         getQueue.kode = jenis
-        val retro = Retro().getRetroClientInstance("https://bdf7-182-253-186-203.ngrok.io/antrian_rsparu/api/").create(Api::class.java)
+        val retro = Retro().getRetroClientInstance("https://d697-182-253-186-203.ngrok.io/antrian_rsparu/api/").create(Api::class.java)
         retro.getNumberQueue(getQueue).enqueue(object : Callback<UserResponse>{
             override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
                 Log.e("Berhasil", response.code().toString())
@@ -95,7 +97,7 @@ class MainActivity : AppCompatActivity() {
     private fun PostTicketQueue(jenis: String){
         var ticketQueue = TicketRequest()
         ticketQueue.kode = jenis
-        var retro = Retro().getRetroClientInstance("https://bdf7-182-253-186-203.ngrok.io/antrian_rsparu/api/").create(Api::class.java)
+        var retro = Retro().getRetroClientInstance("https://d697-182-253-186-203.ngrok.io/antrian_rsparu/api/").create(Api::class.java)
         retro.getTicketQueue(ticketQueue).enqueue(object : Callback<TicketResponse> {
             override fun onResponse(
                 call: Call<TicketResponse>,
@@ -103,11 +105,10 @@ class MainActivity : AppCompatActivity() {
             ){
                 if (jenis.equals("A")) {
                     val cetakTiket = "A ${response.body()?.no_antrian.toString()}"
-                    print(cetakTiket)
-
+                  //  hasil = cetakTiket
                 } else if(jenis.equals("B")){
                     val cetakTiket = "B ${response.body()?.no_antrian.toString()}"
-                    print(cetakTiket)
+                  //  hasil = cetakTiket
                 }
             }
 
@@ -134,6 +135,8 @@ class MainActivity : AppCompatActivity() {
                     ScanningActivity.SCANNING_FOR_PRINTER)
             else {
                 printSomePrintable()
+                postNoAntrian("A")
+                postNoAntrian("B")
             }
         }
 
@@ -193,11 +196,9 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    var printTiket = PostTicketQueue("A")
     private fun printSomePrintable() {
         Toast.makeText(this,"Tunggu Sebentar..", Toast.LENGTH_SHORT).show()
-        Log.e("Pesan Button", printTiket.toString())
-//        printing?.print(printables)
+        Log.e("Pesan Button", PostTicketQueue("A").toString())
     }
 
     private fun printSomePrintableUmum() {
