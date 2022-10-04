@@ -91,6 +91,7 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+
     private fun PostTicketQueue(jenis: String){
         var ticketQueue = TicketRequest()
         ticketQueue.kode = jenis
@@ -99,7 +100,7 @@ class MainActivity : AppCompatActivity() {
             override fun onResponse(
                 call: Call<TicketResponse>,
                 response: Response<TicketResponse>
-            ) {
+            ){
                 if (jenis.equals("A")) {
                     val cetakTiket = "A ${response.body()?.no_antrian.toString()}"
                     print(cetakTiket)
@@ -113,9 +114,7 @@ class MainActivity : AppCompatActivity() {
             override fun onFailure(call: Call<TicketResponse>, t: Throwable) {
                 TODO("Not yet implemented")
             }
-
         })
-
     }
 
     private fun initViews() {
@@ -194,9 +193,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    var printTiket = PostTicketQueue("A")
     private fun printSomePrintable() {
         Toast.makeText(this,"Tunggu Sebentar..", Toast.LENGTH_SHORT).show()
-        Log.e("Pesan Button", PostTicketQueue("A").toString())
+        Log.e("Pesan Button", printTiket.toString())
 //        printing?.print(printables)
     }
 
