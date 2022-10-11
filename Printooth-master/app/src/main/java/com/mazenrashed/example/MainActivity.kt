@@ -2,17 +2,12 @@ package com.mazenrashed.example
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.BitmapFactory
-import android.media.tv.TvContract.Programs.Genres.decode
-import android.net.Uri.decode
+import android.media.MediaPlayer
 import android.os.Bundle
-import android.util.Base64.decode
 import android.util.Log
 import android.view.View
-import android.webkit.URLUtil.decode
 import android.widget.TextView
 import android.widget.Toast
-import android.util.Base64
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.mazenrashed.example.Model.TicketRequest
@@ -34,11 +29,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.lang.Byte.decode
-import java.lang.Integer.decode
-import java.lang.Long.decode
-import java.lang.Short.decode
-import java.net.URLDecoder.decode
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -48,19 +38,21 @@ class MainActivity : AppCompatActivity() {
 
     private var printing : Printing? = null
 
-    lateinit var txtBpjs: TextView
-    lateinit var txtUmum: TextView
-    lateinit var imgView: ImageView
-
-
+    private lateinit var txtBpjs: TextView
+    private lateinit var txtUmum: TextView
+    private lateinit var imgView: ImageView
+    private lateinit var textView: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
+
         txtBpjs = findViewById(R.id.textBpjs)
         txtUmum = findViewById(R.id.textUmum)
         imgView = findViewById(R.id.cardView)
+        textView = findViewById(R.id.textView2)
 
 
         if (Printooth.hasPairedPrinter())
@@ -69,53 +61,70 @@ class MainActivity : AppCompatActivity() {
         initListeners()
         postNoAntrian("A")
         postNoAntrian("B")
+        refresh()
     }
-    
+
+    private fun refresh(){
+        refreshLayout.setOnRefreshListener {
+            refreshLayout.isRefreshing = false
+            postNoAntrian("A")
+            postNoAntrian("B")
+        }
+    }
+
+    fun soundEffect(){
+        val play = MediaPlayer.create(this, R.raw.sound)
+        play.start()
+    }
+
+
+
+
+    val BASE_URL = "https://internationalchest.com/antrian_rsparu/api/"
+
     private fun postNoAntrian(jenis: String){
-        var getQueue = UserRequest()
+        val getQueue = UserRequest()
         getQueue.kode = jenis
-        val retro = Retro().getRetroClientInstance("https://d697-182-253-186-203.ngrok.io/antrian_rsparu/api/").create(Api::class.java)
+        val retro = Retro().getRetroClientInstance(BASE_URL).create(Api::class.java)
         retro.getNumberQueue(getQueue).enqueue(object : Callback<UserResponse>{
-            override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>) {
+            override fun onResponse(call: Call<UserResponse>, response: Response<UserResponse>){
                 Log.e("Berhasil", response.code().toString())
                 if (jenis.equals("A")) {
-                    var cetakTiket = "A " + response.body()?.antrian.toString()
+                    val cetakTiket = "A" + response.body()?.antrian?.toInt()
                     txtBpjs.text = cetakTiket
-                } else if(jenis.equals("B")){
-                    var cetakTiket = "B " + response.body()?.antrian.toString()
+                } else if (jenis.equals("B")) {
+                    val cetakTiket = "B" + response.body()?.antrian?.toInt()
                     txtUmum.text = cetakTiket
                 }
             }
-
             override fun onFailure(call: Call<UserResponse>, t: Throwable) {
             }
-
         })
     }
 
-
-    private fun PostTicketQueue(jenis: String){
-        var ticketQueue = TicketRequest()
+    private fun postTicketQueue(jenis: String): String{
+        val ticketQueue = TicketRequest()
         ticketQueue.kode = jenis
-        var retro = Retro().getRetroClientInstance("https://d697-182-253-186-203.ngrok.io/antrian_rsparu/api/").create(Api::class.java)
+        var nyetak = "A23"
+        val retro = Retro().getRetroClientInstance(BASE_URL).create(Api::class.java)
         retro.getTicketQueue(ticketQueue).enqueue(object : Callback<TicketResponse> {
             override fun onResponse(
                 call: Call<TicketResponse>,
                 response: Response<TicketResponse>
             ){
                 if (jenis.equals("A")) {
-                    val cetakTiket = "A ${response.body()?.no_antrian.toString()}"
-                  //  hasil = cetakTiket
+                    var cetakTiket = response.body()?.no_antrian
+                    nyetak = cetakTiket.toString()
                 } else if(jenis.equals("B")){
-                    val cetakTiket = "B ${response.body()?.no_antrian.toString()}"
-                  //  hasil = cetakTiket
+                    var cetakTiket = response.body()?.no_antrian
+                   nyetak = cetakTiket.toString()
                 }
             }
-
             override fun onFailure(call: Call<TicketResponse>, t: Throwable) {
                 TODO("Not yet implemented")
             }
         })
+        return nyetak
     }
 
     private fun initViews() {
@@ -135,6 +144,7 @@ class MainActivity : AppCompatActivity() {
                     ScanningActivity.SCANNING_FOR_PRINTER)
             else {
                 printSomePrintable()
+                soundEffect()
                 postNoAntrian("A")
                 postNoAntrian("B")
             }
@@ -146,7 +156,10 @@ class MainActivity : AppCompatActivity() {
                 ScanningActivity::class.java),
                 ScanningActivity.SCANNING_FOR_PRINTER)
             else {
+                soundEffect()
                 printSomePrintableUmum()
+                postNoAntrian("A")
+                postNoAntrian("B")
             }
         }
 
@@ -198,14 +211,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun printSomePrintable() {
         Toast.makeText(this,"Tunggu Sebentar..", Toast.LENGTH_SHORT).show()
-        Log.e("Pesan Button", PostTicketQueue("A").toString())
+        val printables = getSomePrintables("BPJS", postTicketQueue("A"))
+        printing?.print(printables)
     }
 
     private fun printSomePrintableUmum() {
         Toast.makeText(this,"Tunggu Sebentar..", Toast.LENGTH_SHORT).show()
-        val printables = getSomePrintables("UMUM", "GG")
-        Log.e("Pesan Button", printables.toString())
-//        printing?.print(printables)
+        val printables = getSomePrintables("UMUM", postTicketQueue("B"))
+        printing?.print(printables)
     }
 
     private fun printSomeImages() {
