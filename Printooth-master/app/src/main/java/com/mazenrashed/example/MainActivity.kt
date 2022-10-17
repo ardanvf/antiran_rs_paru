@@ -2,10 +2,13 @@ package com.mazenrashed.example
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.media.MediaPlayer
+import android.net.Uri.decode
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.webkit.URLUtil.decode
 import android.widget.TextView
 import android.widget.Toast
 import android.widget.ImageView
@@ -29,6 +32,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.lang.Byte.decode
+import java.net.URLDecoder.decode
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -47,13 +52,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-
         txtBpjs = findViewById(R.id.textBpjs)
         txtUmum = findViewById(R.id.textUmum)
         imgView = findViewById(R.id.cardView)
         textView = findViewById(R.id.textView2)
-
 
         if (Printooth.hasPairedPrinter())
             printing = Printooth.printer()
@@ -77,9 +79,6 @@ class MainActivity : AppCompatActivity() {
         play.start()
     }
 
-
-
-
     val BASE_URL = "https://internationalchest.com/antrian_rsparu/api/"
 
     private fun postNoAntrian(jenis: String){
@@ -102,10 +101,17 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+    interface SomeCallBack{
+        fun onSucces()
+
+        fun onFailure(error: String)
+    }
+
     private fun postTicketQueue(jenis: String): String{
+        Toast.makeText(this,"Tunggu Sebentar..", Toast.LENGTH_SHORT).show()
         val ticketQueue = TicketRequest()
         ticketQueue.kode = jenis
-        var nyetak = "A23"
+        var nyetak = ""
         val retro = Retro().getRetroClientInstance(BASE_URL).create(Api::class.java)
         retro.getTicketQueue(ticketQueue).enqueue(object : Callback<TicketResponse> {
             override fun onResponse(
@@ -114,14 +120,18 @@ class MainActivity : AppCompatActivity() {
             ){
                 if (jenis.equals("A")) {
                     var cetakTiket = response.body()?.no_antrian
-                    nyetak = cetakTiket.toString()
-                } else if(jenis.equals("B")){
+                    nyetak = "A$cetakTiket"
+                    val printUnit =  getSomePrintables("BPJS", nyetak)
+                    printing?.print(printUnit)
+                } else {
                     var cetakTiket = response.body()?.no_antrian
-                   nyetak = cetakTiket.toString()
+                    nyetak = "B$cetakTiket"
+                    val printUnit =  getSomePrintables("UMUM", nyetak)
+                    printing?.print(printUnit)
                 }
             }
             override fun onFailure(call: Call<TicketResponse>, t: Throwable) {
-                TODO("Not yet implemented")
+                t.stackTrace
             }
         })
         return nyetak
@@ -137,14 +147,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initListeners() {
-        btnBpjs.setOnClickListener {
-
+        imgView.setOnClickListener {
             if (!Printooth.hasPairedPrinter()) startActivityForResult(Intent(this,
                     ScanningActivity::class.java),
                     ScanningActivity.SCANNING_FOR_PRINTER)
             else {
-                printSomePrintable()
+//                printSomePrintable()
                 soundEffect()
+                postTicketQueue("A")
+
                 postNoAntrian("A")
                 postNoAntrian("B")
             }
@@ -156,8 +167,10 @@ class MainActivity : AppCompatActivity() {
                 ScanningActivity::class.java),
                 ScanningActivity.SCANNING_FOR_PRINTER)
             else {
+                //printSomePrintableUmum()
                 soundEffect()
-                printSomePrintableUmum()
+                postTicketQueue("B")
+
                 postNoAntrian("A")
                 postNoAntrian("B")
             }
@@ -231,13 +244,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     var cal = Calendar.getInstance()
-    var month_date = SimpleDateFormat("EEEE, dd MMMM yyyy, HH:mm")
+    var month_date = SimpleDateFormat("EEEE,dd MMMM yyyy,HH:mm")
     var waktu = month_date.format(cal.time)
 
     private fun getSomePrintables(jenis: String, nomer: String) = ArrayList<Printable>().apply {
-
         add(RawPrintable.Builder(byteArrayOf(27, 100, 4)).build()) // feed lines example in raw mode
-        add(ImagePrintable.Builder(R.drawable.logo, resources)
+        add(ImagePrintable.Builder(R.drawable., resources)
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .build()
         )
@@ -264,7 +276,7 @@ class MainActivity : AppCompatActivity() {
             .build())
 
         add(TextPrintable.Builder()
-            .setText("$nomer \n\n")
+            .setText("$nomer\n\n")
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setFontSize(DefaultPrinter.FONT_SIZE_LARGE)
             .setEmphasizedMode(DefaultPrinter.EMPHASIZED_MODE_BOLD)
