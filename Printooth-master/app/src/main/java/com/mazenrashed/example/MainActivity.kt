@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initListeners() {
-        imgView.setOnClickListener {
+        btnBpjs.setOnClickListener {
             if (!Printooth.hasPairedPrinter()) startActivityForResult(Intent(this,
                     ScanningActivity::class.java),
                     ScanningActivity.SCANNING_FOR_PRINTER)
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getSomePrintables(jenis: String, nomer: String) = ArrayList<Printable>().apply {
         add(RawPrintable.Builder(byteArrayOf(27, 100, 4)).build()) // feed lines example in raw mode
-        add(ImagePrintable.Builder(R.drawable., resources)
+        add(ImagePrintable.Builder(R.drawable.logo_gede, resources)
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .build()
         )
@@ -285,7 +285,7 @@ class MainActivity : AppCompatActivity() {
             .build())
 
         add(TextPrintable.Builder()
-            .setText(waktu + "\n\n\n\n")
+            .setText(waktu + "\n\n\n")
             .setAlignment(DefaultPrinter.ALIGNMENT_CENTER)
             .setNewLinesAfter(1)
             .build())
