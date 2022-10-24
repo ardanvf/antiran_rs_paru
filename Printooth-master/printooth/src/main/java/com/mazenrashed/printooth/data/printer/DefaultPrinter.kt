@@ -14,7 +14,7 @@ open class DefaultPrinter : Printer() {
 
     override fun initJustificationCommand(): ByteArray = byteArrayOf(27, 97)
 
-    override fun initFontSizeCommand(): ByteArray = byteArrayOf(29, 33)
+    override fun initFontSizeCommand(): ByteArray = byteArrayOf(0x1D, 0x21)
 
     override fun initEmphasizedModeCommand(): ByteArray = byteArrayOf(27, 69) //1 on , 0 off
 
@@ -38,7 +38,8 @@ open class DefaultPrinter : Printer() {
         val LINE_SPACING_60: Byte = 60
         val LINE_SPACING_30: Byte = 30
         val FONT_SIZE_NORMAL: Byte = 0x00
-        val FONT_SIZE_LARGE: Byte = 0x10
+        val FONT_SIZE_LARGE: Byte = 0x11
+//        val FONT_SIZE_LARGE_CUSTOM: Byte = 0x01
 
         val CHARCODE_PC437: Byte = 0x00 // USA / Standard Europe
         val CHARCODE_JIS: Byte = 0x01 // Japanese Katakana
